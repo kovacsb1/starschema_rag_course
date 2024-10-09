@@ -24,6 +24,13 @@ The Python packages required are listed in `requirements.txt`. To install it, ru
 python -m pip install -r requirements.txt
 ```
 
+If the installation fails, it could be due to Python versions. I used 3.11.9. To fix this, first try installing `requirements_without_versions.txt`:
+```
+python -m pip install -r requirements_without_versions.txt
+```
+
+If this doesn't solve it, try installing Python 3.11.9. and restart the process with it.
+
 ## Deactivating the virtual environment
 Once you are not working on the course, you can ddeactivate your virtaul environment. Simply run:
 ```
