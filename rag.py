@@ -1,5 +1,6 @@
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.llms.azure_openai import AzureOpenAI
 from dotenv import load_dotenv
 import os
 
@@ -12,6 +13,15 @@ azure_api_version = os.getenv("API_VERSION")
 # bge-base embedding model
 embed_model =  HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
 Settings.embed_model = embed_model
+
+llm = AzureOpenAI(
+    model="gpt-4o",
+    deployment_name=llm_deployment,
+    api_key=azure_api_key,
+    azure_endpoint=azure_endpoint,
+    api_version=azure_api_version,
+)
+Settings.llm = llm
 
 documents = SimpleDirectoryReader("data").load_data()
 index = VectorStoreIndex.from_documents(documents)
