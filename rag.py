@@ -1,6 +1,7 @@
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.llms.azure_openai import AzureOpenAI
+from llama_index.core.node_parser import SentenceSplitter
 from dotenv import load_dotenv
 from IPython.display import Markdown, display
 import os
@@ -32,8 +33,13 @@ llm = AzureOpenAI(
 )
 Settings.llm = llm
 
+splitter = SentenceSplitter(
+    chunk_size=256,
+    chunk_overlap=20,
+)
+
 documents = SimpleDirectoryReader("data").load_data()
-index = VectorStoreIndex.from_documents(documents)
+index = VectorStoreIndex.from_documents(documents, transformations=[splitter])
 
 query_engine = index.as_query_engine()
 response = query_engine.query("What did the author do growing up?")
