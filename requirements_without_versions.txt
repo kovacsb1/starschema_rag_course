@@ -4,6 +4,7 @@ fastembed
 ipykernel
 ipython
 llama-index
+llama-index-embeddings-azure-openai
 llama-index-embeddings-huggingface
 llama-index-embeddings-openai
 llama-index-llms-azure-openai

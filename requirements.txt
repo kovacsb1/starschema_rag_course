@@ -4,6 +4,7 @@ fastembed==0.3.4
 ipykernel==6.29.4
 ipython==8.24.0
 llama-index==0.10.55
+llama-index-embeddings-azure-openai==0.2.5
 llama-index-embeddings-huggingface==0.2.2
 llama-index-embeddings-openai==0.1.10
 llama-index-llms-azure-openai==0.1.10
