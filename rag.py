@@ -47,3 +47,7 @@ print(response)
 
 prompts_dict = query_engine.get_prompts()
 display_prompt_dict(prompts_dict)
+
+for node in response.source_nodes:
+    print(node)
+    print(node.text)
