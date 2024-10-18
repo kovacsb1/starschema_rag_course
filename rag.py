@@ -7,16 +7,8 @@ from llama_index.core import (
 from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
 from llama_index.llms.azure_openai import AzureOpenAI
 from dotenv import load_dotenv
-from IPython.display import Markdown, display
 import os
 
-# define prompt viewing function
-def display_prompt_dict(prompts_dict):
-    for k, p in prompts_dict.items():
-        text_md = f"**Prompt Key**: {k}" f"**Text:** "
-        display(Markdown(text_md))
-        print(p.get_template())
-        display(Markdown(""))
 
 load_dotenv()
 llm_deployment = os.getenv("AZURE_LLM_DEPLOYMENT")
@@ -52,9 +44,6 @@ query_engine = index.as_query_engine(similarity_top_k=10)
 response = query_engine.query("What did the author do growing up?")
 print(response)
 
-prompts_dict = query_engine.get_prompts()
-display_prompt_dict(prompts_dict)
-
-for node in response.source_nodes:
-    print(node)
-    print(node.text)
+# for node in response.source_nodes:
+#     print(node)
+#     print(node.text)
