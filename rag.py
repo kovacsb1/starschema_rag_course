@@ -1,5 +1,5 @@
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
 from llama_index.llms.azure_openai import AzureOpenAI
 from llama_index.core.node_parser import SentenceSplitter
 from dotenv import load_dotenv
@@ -16,12 +16,19 @@ def display_prompt_dict(prompts_dict):
 
 load_dotenv()
 llm_deployment = os.getenv("AZURE_LLM_DEPLOYMENT")
+embedding_deployment = os.getenv("AZURE_EMBEDDING_DEPLOYMENT")
 azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
 azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
 azure_api_version = os.getenv("API_VERSION")
 
 # bge-base embedding model
-embed_model =  HuggingFaceEmbedding(model_name="BAAI/bge-base-en-v1.5")
+embed_model= AzureOpenAIEmbedding(
+    model="text-embedding-ada-002",
+    deployment_name=embedding_deployment,
+    api_key=azure_api_key,
+    azure_endpoint=azure_endpoint,
+    api_version=azure_api_version,
+)
 Settings.embed_model = embed_model
 
 llm = AzureOpenAI(
