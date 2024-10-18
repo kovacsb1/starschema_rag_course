@@ -1,6 +1,4 @@
 from llama_index.core import (
-    VectorStoreIndex, 
-    SimpleDirectoryReader, 
     Settings,
     StorageContext,
     load_index_from_storage
@@ -8,7 +6,6 @@ from llama_index.core import (
 
 from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
 from llama_index.llms.azure_openai import AzureOpenAI
-from llama_index.core.node_parser import SentenceSplitter
 from dotenv import load_dotenv
 from IPython.display import Markdown, display
 import os
@@ -47,22 +44,9 @@ llm = AzureOpenAI(
 )
 Settings.llm = llm
 
-splitter = SentenceSplitter(
-    chunk_size=256,
-    chunk_overlap=20,
-)
-
 PERSIST_DIR = "./storage"
-if not os.path.exists(PERSIST_DIR):
-    # load the documents and create the index
-    documents = SimpleDirectoryReader("data").load_data()
-    index = VectorStoreIndex.from_documents(documents)
-    # store it for later
-    index.storage_context.persist(persist_dir=PERSIST_DIR)
-else:
-    # load the existing index
-    storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
-    index = load_index_from_storage(storage_context)
+storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
+index = load_index_from_storage(storage_context)
 
 query_engine = index.as_query_engine(similarity_top_k=10)
 response = query_engine.query("What did the author do growing up?")
