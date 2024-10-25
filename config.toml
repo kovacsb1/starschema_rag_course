@@ -1,10 +1,12 @@
+[data]
+source_dir = "./data"
+
 [chunking]
 chunk_size = 256
 chunk_overlap = 20
 
-[data]
-source_dir = "./data"
-persist_dir = "./storage"
+[vectordb]
+collection_name = "hcl_notion_balint"
 
 [retrieval]
 similarity_top_k = 10
