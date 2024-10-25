@@ -55,8 +55,14 @@ vector_store = QdrantVectorStore(client=client, collection_name=QDRANT_COLLECTIO
 index = VectorStoreIndex.from_vector_store(vector_store)
 
 query_engine = index.as_query_engine(similarity_top_k=SIMILARITY_TOP_K)
-response = query_engine.query("When will we get the bonus letters?")
+
+query = "When will we get the bonus letters?"
+response = query_engine.query(query)
 print(response)
+
+# prompt_template = query_engine.get_prompts()["response_synthesizer:text_qa_template"]
+# context_str = "\n".join([node.text for node in response.source_nodes])
+# print(prompt_template.format(context_str=context_str, query_str=query))
 
 # for node in response.source_nodes:
 #     print(node)
