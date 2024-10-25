@@ -1,14 +1,15 @@
 from llama_index.core import (
     Settings,
-    StorageContext,
-    load_index_from_storage
+    VectorStoreIndex,
 )
 
 from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
 from llama_index.llms.azure_openai import AzureOpenAI
+from llama_index.vector_stores.qdrant import QdrantVectorStore
 from dotenv import load_dotenv
 import os
 import toml
+import qdrant_client
 
 
 load_dotenv()
@@ -17,10 +18,13 @@ embedding_deployment = os.getenv("AZURE_EMBEDDING_DEPLOYMENT")
 azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
 azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
 azure_api_version = os.getenv("API_VERSION")
+qdrant_url = os.getenv("QDRANT_URL")
+qdrant_port = os.getenv("QDRANT_PORT")
+qdrant_api_key = os.getenv("QDRANT_API_KEY")
 
 config = toml.load("config.toml")
-PERSIST_DIR = config["data"]["persist_dir"]
 SIMILARITY_TOP_K = config["retrieval"]["similarity_top_k"]
+QDRANT_COLLECTION_NAME = config["vectordb"]["collection_name"]
 
 # bge-base embedding model
 embed_model= AzureOpenAIEmbedding(
@@ -41,11 +45,17 @@ llm = AzureOpenAI(
 )
 Settings.llm = llm
 
-storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
-index = load_index_from_storage(storage_context)
+client = qdrant_client.QdrantClient(
+    url=qdrant_url,
+    port=qdrant_port,
+    api_key=qdrant_api_key,
+)
+
+vector_store = QdrantVectorStore(client=client, collection_name=QDRANT_COLLECTION_NAME)
+index = VectorStoreIndex.from_vector_store(vector_store)
 
 query_engine = index.as_query_engine(similarity_top_k=SIMILARITY_TOP_K)
-response = query_engine.query("What did the author do growing up?")
+response = query_engine.query("When will we get the bonus letters?")
 print(response)
 
 # for node in response.source_nodes:
