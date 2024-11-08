@@ -1,6 +1,7 @@
 from llama_index.core import (
     Settings,
     VectorStoreIndex,
+    PromptTemplate
 )
 
 from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
@@ -56,13 +57,27 @@ index = VectorStoreIndex.from_vector_store(vector_store)
 
 query_engine = index.as_query_engine(similarity_top_k=SIMILARITY_TOP_K)
 
+updated_system_prompt = """
+You are a helpful chatbot answering questions related to HCL policies.
+Context information from HCL policty knowledge base is below.
+---------------------
+{context_str}
+---------------------
+Given this information, answer the query. 
+Do not use any previous knowledge!
+Query: {query_str}
+Answer: 
+"""
+
+new_summary_tmpl = PromptTemplate(updated_system_prompt)
+
+query_engine.update_prompts(
+    {"response_synthesizer:summary_template": new_summary_tmpl}
+)
+
 query = "When will we get the bonus letters?"
 response = query_engine.query(query)
 print(response)
-
-# prompt_template = query_engine.get_prompts()["response_synthesizer:text_qa_template"]
-# context_str = "\n".join([node.text for node in response.source_nodes])
-# print(prompt_template.format(context_str=context_str, query_str=query))
 
 # for node in response.source_nodes:
 #     print(node)
