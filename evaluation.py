@@ -16,6 +16,7 @@ import toml
 import qdrant_client
 import nest_asyncio
 from llama_index.core.llama_pack import download_llama_pack
+from rag_evaluator import RagEvaluatorPack
 
 nest_asyncio.apply()
 
@@ -93,7 +94,6 @@ def create_eval_dataset(eval_filename):
 def run_evaluation(eval_filename):
     rag_dataset = LabelledRagDataset.from_json(eval_filename)
 
-    RagEvaluatorPack = download_llama_pack("RagEvaluatorPack", "./pack")
     rag_evaluator = RagEvaluatorPack(
         query_engine=query_engine,  # built with the same source Documents as the rag_dataset
         rag_dataset=rag_dataset,
