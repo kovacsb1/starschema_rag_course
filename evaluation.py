@@ -71,22 +71,38 @@ query_engine = index.as_query_engine(
     llm=llm_ollama,
     similarity_top_k=SIMILARITY_TOP_K)
 
-def create_eval_dataset():
-    nodes = vector_store.get_nodes()
-    # only use the first 10 as these are slow
-    nodes = nodes[:5]
+def create_eval_dataset(eval_filename):
+    if not os.path.isfile(eval_filename):
+        nodes = vector_store.get_nodes()
+        # only use the first 10 as these are slow
+        nodes = nodes[:5]
 
-    # generate test dataset
-    eval_filename = "test_questions.json"
-    dataset_generator = RagDatasetGenerator(
-        nodes=nodes,
-        llm=llm_gpt4,
-        num_questions_per_chunk=1
+        # generate test dataset
+        dataset_generator = RagDatasetGenerator(
+            nodes=nodes,
+            llm=llm_gpt4,
+            num_questions_per_chunk=1
+        )
+        rag_dataset = dataset_generator.generate_dataset_from_nodes()
+
+        # save it to json
+        rag_dataset.save_json(eval_filename)
+    else:
+        print("Eval file already exists, no need to create it")
+
+def run_evaluation(eval_filename):
+    rag_dataset = LabelledRagDataset.from_json(eval_filename)
+
+    RagEvaluatorPack = download_llama_pack("RagEvaluatorPack", "./pack")
+    rag_evaluator = RagEvaluatorPack(
+        query_engine=query_engine,  # built with the same source Documents as the rag_dataset
+        rag_dataset=rag_dataset,
+        judge_llm = llm_gpt4
     )
-    rag_dataset = dataset_generator.generate_dataset_from_nodes()
-
-    # save it to json
-    rag_dataset.save_json(eval_filename)
+    benchmark_df = rag_evaluator.run()
+    benchmark_df.to_csv("eval.csv")
 
 
-create_eval_dataset()
+eval_filename = "test_questions.json"
+create_eval_dataset(eval_filename)
+run_evaluation(eval_filename)
